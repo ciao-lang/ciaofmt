@@ -3,7 +3,7 @@
 
 :- use_module(library(file_utils)).
 :- use_module(library(lists)).
-:- use_module(library(hiordlib)).
+:- use_module(library(hiordlib), [map/3]).
 
 :- doc(author, "Edison Mera").
 
