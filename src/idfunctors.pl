@@ -348,7 +348,7 @@ gen_spaces(N0, " "||Spaces0, Spaces) :-
 % funca(aaa(b(c, ddd),    d(e)), e).
 % funca(aaa(b(c, ddd, e), d(e)), e).
 
-:- use_module(library(hiordlib), [map/3]).
+:- use_module(library(hiordlib), [maplist/3]).
 
 :- meta_predicate map(?, pred(4), ?, ?, ?).
 
@@ -360,7 +360,7 @@ map([A|As], Meta, [B|Bs]) -->
 % This works using backtracking but could be optimized
 
 pos_bookmarks(Argdescs, Scheme, PosBookmarkss) :-
-	map(Argdescs, pos_bookmark_f(Scheme), PosBookmarkss).
+	maplist(pos_bookmark_f(Scheme), Argdescs, PosBookmarkss).
 
 pos_bookmark_f(argdesc${arg => Functors}, Scheme, PosBookmarks) :-
 	map(Functors, pos_bookmark_f_, Scheme, PosBookmarks, []).

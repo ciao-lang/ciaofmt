@@ -3,7 +3,7 @@
 
 :- use_module(library(file_utils)).
 :- use_module(library(lists)).
-:- use_module(library(hiordlib), [map/3]).
+:- use_module(library(hiordlib), [maplist/3]).
 
 :- doc(author, "Edison Mera").
 
@@ -21,7 +21,7 @@ checklines(Alias, Length) :-
 
 checklines_string(FileName, String, Length) :-
 	lines_too_long(String, Length, LinesTooLong),
-	map(LinesTooLong, message_line_too_long(FileName), Messages),
+	maplist(message_line_too_long(FileName), LinesTooLong, Messages),
 	messages(Messages).
 
 message_line_too_long(Line, FileName,
