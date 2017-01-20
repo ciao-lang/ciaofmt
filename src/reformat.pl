@@ -10,6 +10,7 @@
 
 :- use_module(library(file_utils)).
 :- use_module(library(lists)).
+:- use_module(library(hiordlib), [maplist/2]).
 
 :- use_module(ciaofmt(idtokens),    [identify_tokens/6]).
 :- use_module(ciaofmt(poslastchar), [pos_last_char/3]).
@@ -199,9 +200,9 @@ create_indent(IndentLevel, Spaces0, Spaces) :-
 	NTabs is L // 8,
 	NSpac is L mod 8,
 	length(Tabs, NTabs),
-	list(Tabs, '='(0'\t)),
+	maplist('='(0'\t), Tabs),
 	length(Spac, NSpac),
-	list(Spac, '='(0' )),
+	maplist('='(0' ), Spac),
 	append(Tabs,    Spac,   Spaces1),
 	append(Spaces1, Spaces, Spaces0).
 

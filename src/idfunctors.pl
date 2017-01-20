@@ -8,6 +8,7 @@
 
 :- use_package(ciaofmt(reformat_argnames)).
 
+:- use_module(library(hiordlib), [maplist/2]).
 :- use_module(library(lists)).
 :- use_module(ciaofmt(poslastchar)).
 :- use_module(ciaofmt(fmt_style)).
@@ -225,7 +226,8 @@ auto_space_argdescs([Argdesc1|Argdescs0], GArgdescs0) :-
 		    indentlevel => IndentLevel, argdescs => Argdescs1,
 		    pos => pos(Col, LineF1)}] ->
 	    ( LineA1 =:= LineF1 -> true
-	    ; list(Functors1, auto_space_functordesc) ),
+	    ; maplist(auto_space_functordesc, Functors1)
+	    ),
 	    ( select(Argdesc2, Argdescs0, Argdescs01),
 		Argdesc2 = argdesc${arg => Functors2, pos => pos(_, LineA2)},
 		Functors2 = % Consider when arg is only one functor
