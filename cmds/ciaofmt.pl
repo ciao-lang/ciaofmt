@@ -1,7 +1,7 @@
 :- module(ciaofmt, [main/1], [assertions]).
 
 :- doc(title, "Automatic source code formatting for Ciao").
-:- doc(author, "Ciao Development Team").
+:- doc(author, "The Ciao Development Team").
 
 :- doc(module, "This command offers source code formatting and style
    checking operations for Ciao (and Prolog) source code.
