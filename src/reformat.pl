@@ -10,6 +10,7 @@
 
 :- use_module(library(file_utils)).
 :- use_module(library(lists)).
+:- use_module(library(messages), [show_message/2]).
 :- use_module(library(hiordlib), [maplist/2]).
 
 :- use_module(ciaofmt(idtokens),    [identify_tokens/6]).
@@ -253,9 +254,26 @@ reformat(Source, SourceS, TargetS) :-
 reformat_file(Source, Target) :-
 	file_to_string(Source, SourceS),
 	reformat(Source, SourceS, TargetS),
+	( check_formatting(SourceS, TargetS) ->
+	    true
+	; show_message(error, "Formatting produced non-blank changes! Aborting!"),
+	  fail
+	),
 	string_to_file(TargetS, Target).
 
 reformat_file(File) :- reformat_file(File, File).
+
+check_formatting([], []).
+check_formatting([X|Xs], [X|Ys]) :- !,
+	check_formatting(Xs, Ys).
+check_formatting([X|Xs], Ys) :- isblank(X), !,
+	check_formatting(Xs, Ys).
+check_formatting(Xs, [Y|Ys]) :- isblank(Y), !,
+	check_formatting(Xs, Ys).
+
+isblank(0' ).
+isblank(0'\n).
+isblank(0'\t).
 
 %% debug_display(Tokens2, Argdescs) :-
 %% 	varset(Tokens2, Vars),
