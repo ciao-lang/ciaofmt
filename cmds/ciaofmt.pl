@@ -30,7 +30,7 @@ Usage: ciaofmt [<opts>] [<cmd>] [[<input>] <output>]|[--help]
 
 Reformat the input source code into the given output file. If input is
 omitted, program is read from standard input. Use '-' to emit output
-to standard error.
+to standard output.
 
 Options:
   --help    show this message
