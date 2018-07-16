@@ -1,4 +1,4 @@
-:- module(ciaofmt, [main/1], [assertions]).
+:- module(ciaofmt, [main/1], [assertions, fsyntax]).
 
 :- doc(title, "Automatic source code formatting for Ciao").
 :- doc(author, "The Ciao Development Team").
@@ -20,6 +20,7 @@
 :- use_package(ciaofmt(reformat_argnames)).
 :- use_module(ciaofmt(reformat)).
 :- use_module(ciaofmt(checklines)).
+:- use_module(ciaofmt(fmt_style)).
 
 % ---------------------------------------------------------------------------
 
@@ -28,19 +29,15 @@ show_help :-
 	display_string(M).
 
 usage_message("
-Usage: ciaofmt [<opts>] [<cmd>] [[<input>] <output>]|[--help]
+Usage: ciaofmt [<opts>] [<in>] [<out>]
 
-Reformat the input source code into the given output file. If input is
-omitted, program is read from standard input. Use '-' to emit output
-to standard output.
+Reformat or check syntax of the input source file. Use '-' to read
+from standard input.
 
 Options:
-  --help    show this message
-
-Commands:
-  -f        reformat (default command)
-  -w        do not reformat, just show formatting warnings
-            (e.g., line length)
+  -h|--help  show this message
+  -c         check formatting (do not write output)
+  -w         replace the input file (equivalent to <in> <in>)
 
 ").
 
@@ -55,47 +52,56 @@ main(Args) :-
 main(Args) :-
 	show_message(error, "Unknown arguments ~w", [Args]).
 
+process_args(['-h'], help) :- !,
+	show_help.
 process_args(['--help'], help) :- !,
 	show_help.
+process_args(['-c', Source], Action) :- !,
+	Action = check(Source).
 process_args(['-w', Source], Action) :- !,
-	default_length(Length), % TODO: extract from fmt_style
-	Action = check(Source, Length).
-process_args(['-w'], Action) :- !,
-	default_length(Length), % TODO: extract from fmt_style
-	Action = check('', Length).
-process_args([Source, '-'], Action) :- !,
-	Action = reformat(Source, '').
+	Action = reformat(Source, Source).
+process_args([], Action) :- !,
+	Action = reformat('-', '-').
+process_args([Source], Action) :- !,
+	Action = reformat(Source, '-').
 process_args([Source, Target], Action) :- !,
 	Action = reformat(Source, Target).
-process_args([Source], Action) :- !,
-	Action = reformat(Source, Source).
-process_args([], Action) :-
-	Action = reformat('', '').
 
 default_length(80).
 
 do_process(help) :- !,
 	show_help.
-do_process(check('', Length)) :- !, % read from stdin
-	current_input(CI),
-	stream_to_string(CI, String),
-	checklines_string('-', String, Length). % TODO: passing '-' here is OK?
-do_process(check(FileName, Length)) :- !, % read from file
-	file_to_string(FileName, String),
-	checklines_string(FileName, String, Length).
-do_process(reformat('', '')) :- !, % read from stdin, write to stdout
-	current_input(CI),
-	stream_to_string(CI, SourceS),
-	reformat(_Source, SourceS, Target),
-	write_string(Target).
-do_process(reformat(Source, '')) :- !, % write to stdout
+do_process(check(Source)) :- !, % read from stdin
+	Length = ~max_line_length,
+	SourceS = ~read_source(Source),
+	checklines_string(Source, SourceS, Length). % TODO: passing '-' here is OK?
+do_process(reformat(Source, Target)) :- !,
+	SourceS = ~read_source(Source),
+	reformat(Source, SourceS, TargetS),
+	write_target(TargetS, Target).
+
+read_source(Source, String) :-
+	( Source = '-' -> % read from stdin
+	    current_input(CI),
+	    stream_to_string(CI, String)
+	; file_to_string(Source, String)
+	).
+
+write_target(String, Target) :-
+	( Target = '-' -> % write to stdout
+	    write_string(String)
+	; string_to_file(String, Target)
+	).
+
+:- use_module(library(file_utils)).
+:- export(reformat_file/1).
+:- export(reformat_file/2).
+reformat_file(Source, Target) :-
 	file_to_string(Source, SourceS),
-	reformat(Source, SourceS, Target),
-	write_string(Target).
-do_process(reformat(Source, Source)) :- !, % write to same file
-	reformat_file(Source).
-do_process(reformat(Source, Target)) :- !, % write to other file
-	reformat_file(Source, Target).
+	reformat(Source, SourceS, TargetS),
+	string_to_file(TargetS, Target).
+
+reformat_file(File) :- reformat_file(File, File).
 
 % ---------------------------------------------------------------------------
 

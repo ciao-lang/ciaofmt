@@ -1,5 +1,4 @@
-:- module(reformat, [reformat/3, reformat_file/1, reformat_file/2],
-    [assertions, dcg, fsyntax]).
+:- module(reformat, [], [assertions, dcg, fsyntax]).
 
 :- doc(title, "Automatic source code formatting").
 
@@ -8,7 +7,6 @@
 
 :- use_package(ciaofmt(reformat_argnames)).
 
-:- use_module(library(file_utils)).
 :- use_module(library(lists)).
 :- use_module(library(messages), [show_message/2]).
 :- use_module(library(hiordlib), [maplist/2]).
@@ -237,6 +235,7 @@ tokens_strings([token${value => String}|Tokens]) -->
 dcg_app(String, L0, L) :-
 	append(String, L, L0).
 
+:- export(reformat/3).
 reformat(Source, SourceS, TargetS) :-
 	init_fmtconfig(PliConfig0),
 	identify_tokens(Tokens0, Source, PliConfig0, PliConfig, SourceS, []),
@@ -255,13 +254,6 @@ reformat(Source, SourceS, TargetS) :-
 	; show_message(error, "Formatting produced non-blank changes! Aborting!"),
 	  fail
 	).
-
-reformat_file(Source, Target) :-
-	file_to_string(Source, SourceS),
-	reformat(Source, SourceS, TargetS),
-	string_to_file(TargetS, Target).
-
-reformat_file(File) :- reformat_file(File, File).
 
 check_formatting([], []).
 check_formatting([X|Xs], [X|Ys]) :- !,
