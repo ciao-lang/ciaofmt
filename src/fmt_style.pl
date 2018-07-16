@@ -68,25 +68,25 @@ remove_currspace(_,        endclause, _).
 % not_autospace(atom,     operator,  _,    "/").
 % not_autospace(atom,     operator,  _,    "$").
 
-not_autospace(atom,     operator,  _,    _).
-not_autospace(operator, atom,      _,    _).
-not_autospace(var,      operator,  _,    ":").
-not_autospace(operator, var,       _,    _).
-not_autospace(operator, openfunc,  _,    _).
-not_autospace(operator, openmeta,  _,    _).
-not_autospace(operator, openpar,   _,    _).
-not_autospace(operator, number,    _,    _).
-not_autospace(atom,     openpar,   _,    _).
-not_autospace(var,      openpar,   _,    _).
-not_autospace(var,      operator,  _,    _).
-not_autospace(var,      number,    _,    _).
-not_autospace(number,   operator,  _,    _).
-not_autospace(string,   operator,  _,    "||").
-not_autospace(operator, string,    "||", _).
-not_autospace(operator, var,       "||", _).
-not_autospace(spaces,   _,         _,    _).
-not_autospace(_,        separator, _,    _).
-not_autospace(_,        endclause, _,    _).
+not_autospace(atom,     operator,  _,    _) :- !.
+not_autospace(operator, atom,      _,    _) :- !.
+not_autospace(var,      operator,  _,    ":") :- !.
+not_autospace(operator, var,       _,    _) :- !.
+not_autospace(operator, openfunc,  _,    _) :- !.
+not_autospace(operator, openmeta,  _,    _) :- !.
+not_autospace(operator, openpar,   _,    _) :- !.
+not_autospace(operator, number,    _,    _) :- !.
+not_autospace(atom,     openpar,   _,    _) :- !.
+not_autospace(var,      openpar,   _,    _) :- !.
+not_autospace(var,      operator,  _,    _) :- !.
+not_autospace(var,      number,    _,    _) :- !.
+not_autospace(number,   operator,  _,    _) :- !.
+not_autospace(string,   operator,  _,    "||") :- !.
+not_autospace(operator, string,    "||", _) :- !.
+not_autospace(operator, var,       "||", _) :- !.
+not_autospace(spaces,   _,         _,    _) :- !.
+not_autospace(_,        separator, _,    _) :- !.
+not_autospace(_,        endclause, _,    _) :- !.
 
 autospace_style(full_spaced, _,          _,          _,      _,      " ").
 autospace_style(norm_spaced, TokenType0, TokenType1, Value0, Value1, Space) :-
@@ -159,14 +159,14 @@ token_type_t := spaces|string|openfunc|openmeta|openoper|atom|number|cut|var|
 update_indent(operator,  [],             [operator]) :- !.
 update_indent(endclause, [operator],     []) :- !.
 update_indent(closepar,  [openpar(_)|I], I) :- !.
-update_indent(openpar,   I,              [openpar(_)|I]).
-update_indent(openfunc,  I,              [openpar("" -_)|I]).
-update_indent(openmeta,  I,              [openpar("" -_)|I]).
-update_indent(openoper,  I,              [openpar("" -_)|I]).
+update_indent(openpar,   I,              [openpar(_)|I]) :- !.
+update_indent(openfunc,  I,              [openpar("" -_)|I]) :- !.
+update_indent(openmeta,  I,              [openpar("" -_)|I]) :- !.
+update_indent(openoper,  I,              [openpar("" -_)|I]) :- !.
 update_indent(_,         I,              I).
 
 update_alines(closepar,  L0, L) :- !, (L0 > 0 -> L is L0 - 1 ; L is 0).
-update_alines(endclause, _,  0).
+update_alines(endclause, _,  0) :- !.
 update_alines(_,         L,  L).
 
 bookmark_begin(separator, _).
