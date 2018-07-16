@@ -3,6 +3,8 @@
 :- doc(title, "Automatic source code formatting for Ciao").
 :- doc(author, "The Ciao Development Team").
 
+:- doc(stability, alpha).
+
 :- doc(module, "This command offers source code formatting and style
    checking operations for Ciao (and Prolog) source code.
 

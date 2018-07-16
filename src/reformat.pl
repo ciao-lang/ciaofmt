@@ -249,16 +249,16 @@ reformat(Source, SourceS, TargetS) :-
 	auto_indent_tokens(Tokens2, PliConfig, [], 0, Tokens, [], pos(0, 1)),
 	tokens_strings(Tokens, TargetS, []),
 	% flatten(TargetS0, TargetS),
-	pop_prolog_flag(write_strings).
-
-reformat_file(Source, Target) :-
-	file_to_string(Source, SourceS),
-	reformat(Source, SourceS, TargetS),
+	pop_prolog_flag(write_strings),
 	( check_formatting(SourceS, TargetS) ->
 	    true
 	; show_message(error, "Formatting produced non-blank changes! Aborting!"),
 	  fail
-	),
+	).
+
+reformat_file(Source, Target) :-
+	file_to_string(Source, SourceS),
+	reformat(Source, SourceS, TargetS),
 	string_to_file(TargetS, Target).
 
 reformat_file(File) :- reformat_file(File, File).

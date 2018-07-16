@@ -360,22 +360,30 @@ map([A|As], Meta, [B|Bs]) -->
 	map(As, Meta, Bs).
 
 % This works using backtracking but could be optimized
+% TODO: Really slow in practice
+% E.g.
+% q([p(1),p(1),p(1),p(1),p(1),p(1),p(1),p(1),p(1),p(1)],[p(1),p(1),p(1)],[p(1),p(1),p(1)],[p(1),p(1),p(1),p(1),p(1),p(1),p(1),p(1),p(1),p(1)],[p(1),p(1),p(1)],[p(1),p(1),p(1)]).
+% q([p(1),p(1),p(1)],[p(1),p(1),p(1)],[p(1),p(1),p(1)],[p(1),p(1),p(1)],[p(1),p(1),p(1)],[p(1),p(1),p(1)]).
 
 pos_bookmarks(Argdescs, Scheme, PosBookmarkss) :-
 	maplist(pos_bookmark_f(Scheme), Argdescs, PosBookmarkss).
 
-pos_bookmark_f(argdesc${arg => Functors}, Scheme, PosBookmarks) :-
-	map(Functors, pos_bookmark_f_, Scheme, PosBookmarks, []).
-
-pos_bookmark_f_(functordesc${argdescs => Argdescs}, Scheme) -->
-	map(Argdescs, pos_bookmark_f__, Scheme).
-
-pos_bookmark_f__(argdesc${arg => Functors, pos => Pos,
-		bookmark => Bookmark}, Scheme) -->
-	(
-	    {var(Scheme), Functors \== []} ->
-	    (map(Functors, pos_bookmark_f_, Scheme) ; {Scheme = []})
-	;
-	    (map(Functors, pos_bookmark_f_, Scheme) -> [] ; {Scheme = []})
-	),
-	[pb(Pos, Bookmark)].
+% TODO: Disabling positioning args because it is not terminating on
+% some examples (see above)
+pos_bookmark_f(_,_,[]).
+%
+% pos_bookmark_f(argdesc${arg => Functors}, Scheme, PosBookmarks) :-
+% 	map(Functors, pos_bookmark_f_, Scheme, PosBookmarks, []).
+% 
+% pos_bookmark_f_(functordesc${argdescs => Argdescs}, Scheme) -->
+% 	map(Argdescs, pos_bookmark_f__, Scheme).
+% 
+% pos_bookmark_f__(argdesc${arg => Functors, pos => Pos,
+% 		bookmark => Bookmark}, Scheme) -->
+% 	(
+% 	    {var(Scheme), Functors \== []} ->
+% 	    (map(Functors, pos_bookmark_f_, Scheme) ; {Scheme = []}) % TODO: slow!
+% 	;
+% 	    (map(Functors, pos_bookmark_f_, Scheme) -> [] ; {Scheme = []})
+% 	),
+% 	[pb(Pos, Bookmark)].
