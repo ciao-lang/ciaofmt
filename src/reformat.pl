@@ -255,17 +255,25 @@ reformat(Source, SourceS, TargetS) :-
 	  fail
 	).
 
-check_formatting([], []).
+% :- use_module(library(messages), [show_message/3]).
+
+check_formatting([], []) :- !.
 check_formatting([X|Xs], [X|Ys]) :- !,
 	check_formatting(Xs, Ys).
 check_formatting([X|Xs], Ys) :- isblank(X), !,
 	check_formatting(Xs, Ys).
 check_formatting(Xs, [Y|Ys]) :- isblank(Y), !,
 	check_formatting(Xs, Ys).
+% check_formatting(Xs, Ys) :-
+% 	( Xs = [X|_] -> true ; X = 0'? ),
+% 	( Ys = [Y|_] -> true ; Y = 0'? ),
+% 	show_message(error, "First difference: ~d \\= ~d~n", [X,Y]).
 
 isblank(0' ).
 isblank(0'\n).
 isblank(0'\t).
+isblank(0'\r).
+isblank(0').
 
 %% debug_display(Tokens2, Argdescs) :-
 %% 	varset(Tokens2, Vars),

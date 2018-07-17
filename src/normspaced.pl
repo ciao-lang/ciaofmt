@@ -120,10 +120,12 @@ new_lines(N0, [0'\n|I0], I) :-
 	N is N0 - 1,
 	new_lines(N, I0, I).
 
-num_lines([],           Lines,  Lines).
+num_lines(Cs, _Lines0, _Lines) :- var(Cs), !, fail.
+num_lines([],           Lines0, Lines):- !, Lines = Lines0.
 num_lines([0'\n|Chars], Lines0, Lines) :-
 	!,
 	Lines1 is Lines0 + 1,
 	num_lines(Chars, Lines1, Lines).
 num_lines([_|Chars], Lines0, Lines) :-
 	num_lines(Chars, Lines0, Lines).
+

@@ -91,6 +91,7 @@ identify_functors_([Token0|Tokens0], [Token0|Values0], IndentationStyle,
 	    Functors2, Functors1),
 	identify_functors_(Tokens1, Values1, IndentationStyle, IndentLevel1,
 	    Pos2, Functors2, Functors),
+	% ( ground(Values1) -> true ; display(noground(Values1)), nl ),
 	!.
 identify_functors_([], [], _, _, _, Functors, Functors) :- !.
 identify_functors_([], Values1, IndentationStyle, IndentLevel, Pos0,
@@ -159,6 +160,7 @@ update_functors_end_argument(TokenType0, Value0, IndentationStyle,
 	    ( not_auto_tabuled(IndentationStyle, TokenType2) ->
 		Bookmark = "" ; true )
 	},
+	{ Bookmark = "" }, % TODO: disabled pos_bookmark_f! (be aware of uninstantiated variables!)
 	!,
 	push_args_and_bookmark(Functors0, Functors, Bookmark, Tokens0, Tokens,
 	    Pos0, Pos).

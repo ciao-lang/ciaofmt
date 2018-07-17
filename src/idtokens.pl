@@ -3,6 +3,8 @@
 
 :- doc(title, "Tokenizer").
 
+% TODO: Merge with the system tokenizer; make sure it is robust on invalid syntax
+
 :- use_module(library(messages)).
 :- use_module(library(lists)).
 :- use_module(library(llists)).
@@ -10,67 +12,103 @@
 :- use_module(ciaofmt(fmt_style)).
 :- use_module(ciaofmt(poslastchar)).
 
-lowchar(A) :- A >= 0'a, A =< 0'z.
-uppchar(A) :- A >= 0'A, A =< 0'Z.
+% ---------------------------------------------------------------------------
 
-expchar := 0'e|0'E.
-sign := 0'+|0'-.
+:- discontiguous(chartype/2).
+
+chartype(lowchar, A) :- lowchar(A).
+lowchar(A) :- A >= 0'a, A =< 0'z, !.
+lowchar(A) :- A > 127. % TODO: assume anything else is lowchar
+
+chartype(uppchar, A) :- uppchar(A).
+uppchar(A) :- A >= 0'A, A =< 0'Z, !.
+
+chartype(expchar, A) :- expchar(A).
+expchar(0'e).
+expchar(0'E).
+
+chartype(sign, A) :- sign(A).
+sign(0'+).
+sign(0'-).
 
 alpha(A) :- lowchar(A), !.
 alpha(A) :- uppchar(A).
 
-digit(A) :- A >= 0'0, A =< 0'9.
+chartype(digit, A) :- digit(A).
+digit(A) :- A >= 0'0, A =< 0'9, !.
 
+chartype(hexdigit, A) :- hexdigit(A).
 hexdigit(A) :- digit(A).
-hexdigit(A) :- A >= 0'a, A =< 0'f.
-hexdigit(A) :- A >= 0'A, A =< 0'F.
+hexdigit(A) :- A >= 0'a, A =< 0'f, !.
+hexdigit(A) :- A >= 0'A, A =< 0'F, !.
 
-octaldigit(A) :- 0'0 =< A, A =< 0'7.
+chartype(octaldigit, A) :- octaldigit(A).
+octaldigit(A) :- 0'0 =< A, A =< 0'7, !.
 
+chartype(bindigit, A) :- bindigit(A).
 bindigit(0'0).
 bindigit(0'1).
 
 alphanum(A) :- alpha(A), !.
 alphanum(A) :- digit(A).
 
+chartype(labelchar, A) :- labelchar(A).
 labelchar(A) :- alphanum(A), !.
 labelchar(A) :- underscore(A).
 
 underscore(0'_).
 
-cutchar := 0'!.
+chartype(cutchar, A) :- cutchar(A).
+cutchar(0'!).
 
-floatsep := 0'..
+chartype(floatsep, A) :- floatsep(A).
+floatsep(0'.).
 
-endclausechar := 0'..
+chartype(endclausechar, A) :- endclausechar(A).
+endclausechar(0'.).
 
-space := 0' |0'\n|0'\t|0'|0'\r|0' .
+chartype(space, A) :- space(A).
+space(0' ).
+space(0'\n).
+space(0'\t).
+space(0').
+space(0'\r).
 
-opchar := 0'+|0'-|0'*|0'/|0'\\|0'=|0'<|0'>|0':|0'&|0'||0'$|0'.|0'?|0';|0'~|0'#|
-	0'^|0'@.
+chartype(opchar, A) :- opchar(A).
+opchar(0'+).
+opchar(0'-).
+opchar(0'*).
+opchar(0'/).
+opchar(0'\\).
+opchar(0'=).
+opchar(0'<).
+opchar(0'>).
+opchar(0':).
+opchar(0'&).
+opchar(0'|).
+opchar(0'$).
+opchar(0'.).
+opchar(0'?).
+opchar(0';).
+opchar(0'~).
+opchar(0'#).
+opchar(0'^).
+opchar(0'@).
+opchar(0'`).
 
+chartype(var0, A) :- var0(A).
 var0(A) :- uppchar(A), !.
 var0(A) :- underscore(A).
 
-chartype(lowchar) := ~lowchar.
-chartype(expchar) := ~expchar.
-chartype(opchar) := ~opchar.
-chartype(space) := ~space.
-chartype(digit) := ~digit.
-chartype(cutchar) := ~cutchar.
-chartype(labelchar) := ~labelchar.
-chartype(floatsep) := ~floatsep.
-chartype(hexdigit) := ~hexdigit.
-chartype(octaldigit) := ~octaldigit.
-chartype(bindigit) := ~bindigit.
-chartype(sign) := ~sign.
-chartype(var0) := ~var0.
-chartype(endclausechar) := ~endclausechar.
-chartype(openpar) := ~openpar.
-chartype(closepar) := ~closepar.
+chartype(openpar, A) :- openpar(A).
+openpar(0'().
+openpar(0'[).
+openpar(0'{).
 
-openpar := 0'(|0'[|0'{.
-closepar := 0')|0']|0'}.
+chartype(closepar, A) :- closepar(A).
+closepar(0')).
+closepar(0']).
+closepar(0'}).
 
 % ----------------------------------------------------------------------------
 
@@ -96,8 +134,7 @@ do_process_command_in_comment(_) --> [].
 
 identify_tokens(Tokens, Source, PliConfig0, PliConfig, String0, String) :-
 	identify_tokens_(Tokens, PliConfig0, PliConfig, String0, String),
-	(
-	    member(token(unknown, Value), Tokens) ->
+	( member(token(unknown, Value), Tokens) ->
 	    append(InitString, Value, String0),
 	    pos_last_char(InitString, pos(0, 1), pos(_Col, Line)),
 	    (
@@ -228,8 +265,8 @@ parse_comment1_(String, String) :-
 	!.
 parse_comment1_ -->
 	[_C],
-	parse_comment1_,
-	!.
+	!,
+	parse_comment1_.
 
 parse_commentn -->
 	"/*",
@@ -380,13 +417,6 @@ parse_chars(CharType) -->
 	parse_chars(CharType).
 parse_chars(_) --> "".
 
-%:- meta_predicate parse_char(pred(1), ?, ?).
-
-% parse_char(CharType) -->
-% 	[C],
-% 	{chartype(CharType, C)},
-% 	!.
-
 parse_char(CharType, [C|T], T) :-
 	chartype(CharType, C),
 	!.
@@ -414,6 +444,13 @@ parse_enclosed(EncloseChar) -->
 
 parse_enclosed_(EncloseChar) -->
 	[EncloseChar, EncloseChar],
+	!,
+	parse_enclosed_(EncloseChar).
+parse_enclosed_(EncloseChar) -->
+	"\\",
+	[C], { C >= 0'0, C =< 0'7 },
+	( [C2], { C2 >= 0'0, C2 =< 0'7 } ; [] ),
+	( "\\" ; [] ), % (optional)
 	!,
 	parse_enclosed_(EncloseChar).
 parse_enclosed_(EncloseChar) -->
