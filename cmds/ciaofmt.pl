@@ -13,7 +13,6 @@
 @end{verbatim}
 ").
 
-:- use_module(library(strings),  [write_string/1]).
 :- use_module(library(messages), [show_message/3]).
 :- use_module(library(streams_utils)).
 
