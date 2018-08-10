@@ -1,7 +1,7 @@
 :- module(checklines, [checklines/1, checklines/2, checklines_string/3],
 	    [assertions, fsyntax]).
 
-:- use_module(library(streams_utils)).
+:- use_module(library(stream_utils)).
 :- use_module(library(lists)).
 :- use_module(library(hiordlib), [maplist/3]).
 

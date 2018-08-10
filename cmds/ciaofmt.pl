@@ -14,7 +14,7 @@
 ").
 
 :- use_module(library(messages), [show_message/3]).
-:- use_module(library(streams_utils)).
+:- use_module(library(stream_utils)).
 
 :- use_package(ciaofmt(reformat_argnames)).
 :- use_module(ciaofmt(reformat)).
@@ -92,7 +92,7 @@ write_target(String, Target) :-
 	; string_to_file(String, Target)
 	).
 
-:- use_module(library(streams_utils)).
+:- use_module(library(stream_utils)).
 :- export(reformat_file/1).
 :- export(reformat_file/2).
 reformat_file(Source, Target) :-
