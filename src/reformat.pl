@@ -7,6 +7,8 @@
 
 :- use_package(ciaofmt(reformat_argnames)).
 
+:- use_module(engine(prolog_flags), [push_prolog_flag/2, pop_prolog_flag/1]). % TODO: find a better solution
+
 :- use_module(library(lists)).
 :- use_module(library(messages), [show_message/2]).
 :- use_module(library(hiordlib), [maplist/2]).
@@ -239,7 +241,7 @@ dcg_app(String, L0, L) :-
 reformat(Source, SourceS, TargetS) :-
 	init_fmtconfig(PliConfig0),
 	identify_tokens(Tokens0, Source, PliConfig0, PliConfig, SourceS, []),
-	push_prolog_flag(write_strings, on),
+	push_prolog_flag(write_strings, on), % TODO: find a better solution
 	normalize_spaced(Tokens0, PliConfig, Tokens1),
 	identify_functors(Tokens1, Tokens2, PliConfig, [], Argdescs0),
 	% debug_display(Tokens2, Argdescs0),

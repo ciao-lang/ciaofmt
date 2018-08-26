@@ -15,6 +15,8 @@
 
 :- use_module(library(messages), [show_message/3]).
 :- use_module(library(stream_utils)).
+:- use_module(engine(stream_basic)).
+:- use_module(engine(io_aux), [display_string/1]).
 
 :- use_package(ciaofmt(reformat_argnames)).
 :- use_module(ciaofmt(reformat)).
