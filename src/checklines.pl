@@ -5,7 +5,7 @@
 :- use_module(library(lists)).
 :- use_module(library(hiordlib), [maplist/3]).
 :- use_module(engine(stream_basic)).
-:- use_module(engine(io_aux), [messages/1]).
+:- use_module(engine(messages_basic), [messages/1]).
 
 :- doc(author, "Edison Mera").
 
