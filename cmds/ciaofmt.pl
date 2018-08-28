@@ -16,7 +16,6 @@
 :- use_module(library(messages), [show_message/3]).
 :- use_module(library(stream_utils)).
 :- use_module(engine(stream_basic)).
-:- use_module(engine(messages_basic), [display_string/1]).
 
 :- use_package(ciaofmt(reformat_argnames)).
 :- use_module(ciaofmt(reformat)).
@@ -27,7 +26,7 @@
 
 show_help :-
 	usage_message(M),
-	display_string(M).
+	write_string(M).
 
 usage_message("
 Usage: ciaofmt [<opts>] [<in>] [<out>]
