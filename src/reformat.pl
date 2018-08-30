@@ -7,7 +7,7 @@
 
 :- use_package(ciaofmt(reformat_argnames)).
 
-:- use_module(engine(prolog_flags), [push_prolog_flag/2, pop_prolog_flag/1]). % TODO: find a better solution
+:- use_module(engine(runtime_control), [push_prolog_flag/2, pop_prolog_flag/1]). % TODO: find a better solution
 
 :- use_module(library(lists)).
 :- use_module(library(messages), [show_message/2]).
