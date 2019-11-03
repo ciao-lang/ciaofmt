@@ -2,7 +2,7 @@
 		remove_nl/2,
 		identify_functors/5,
 		auto_space_argdescs/2],
-	    [assertions, regtypes, hiord, dcg, fsyntax, nativeprops]).
+	    [assertions, regtypes, hiord_old, dcg, fsyntax, nativeprops]).
 
 :- doc(title, "Functor formatter").
 
