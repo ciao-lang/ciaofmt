@@ -228,7 +228,7 @@ inc_indent(I, L0, L) :-
 indent_length(_) --> fix_indent, !.
 indent_length([]) --> [].
 indent_length([operator]) --> !, inc_indent(4), indent_length([]).
-indent_length([_]) --> !, inc_indent(12), indent_length([]).
+indent_length([_]) --> !, inc_indent(4), indent_length([]). % TODO: it was 12, change? (see indent_example)
 indent_length([_|IndentLevel]) -->
 	long_indent,
 	!,
