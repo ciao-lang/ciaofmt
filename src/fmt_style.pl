@@ -12,8 +12,8 @@ indentation_style_t := full_spaced|norm_spaced|left_spaced|save_spaces.
 :- export(fmtconfig_t/1).
 :- regtype fmtconfig_t/1.
 fmtconfig_t(fmtconfig${max_length_line => MLL, indentation_style => IS}) :-
-	nnegint(MLL),
-	indentation_style_t(IS).
+    nnegint(MLL),
+    indentation_style_t(IS).
 
 % ---------------------------------------------------------------------------
 % Default style
@@ -24,9 +24,9 @@ fmtconfig_t(fmtconfig${max_length_line => MLL, indentation_style => IS}) :-
 :- export(init_fmtconfig/1).
 :- pred init_fmtconfig(?fmtconfig_t) # "Get default configuration values".
 init_fmtconfig(fmtconfig${
-		max_length_line => ~max_line_length, % TODO: ignored for reformatting
-		indentation_style => norm_spaced
-	    }).
+            max_length_line => ~max_line_length, % TODO: ignored for reformatting
+            indentation_style => norm_spaced
+        }).
 
 :- export(max_line_length/1).
 max_line_length := 80.
@@ -69,11 +69,11 @@ not_autospace(_,        endclause, _,    _) :- !.
 :- export(autospace_style/6).
 autospace_style(full_spaced, _,          _,          _,      _,      " ").
 autospace_style(norm_spaced, TokenType0, TokenType1, Value0, Value1, Space) :-
-	autospace_norm_spaced(TokenType0, TokenType1, Value0, Value1, Space).
+    autospace_norm_spaced(TokenType0, TokenType1, Value0, Value1, Space).
 autospace_style(save_spaces, TokenType0, TokenType1, Value0, Value1, Space) :-
-	autospace_save_spaces(TokenType0, TokenType1, Value0, Value1, Space).
+    autospace_save_spaces(TokenType0, TokenType1, Value0, Value1, Space).
 autospace_style(left_spaced, TokenType0, TokenType1, Value0, Value1, Space) :-
-	autospace_left_spaced(TokenType0, TokenType1, Value0, Value1, Space).
+    autospace_left_spaced(TokenType0, TokenType1, Value0, Value1, Space).
 
 autospace_norm_spaced(openpar,   _,         _,   _,    "") :- !.
 autospace_norm_spaced(openoper,  _,         _,   _,    "") :- !.
@@ -128,18 +128,18 @@ is_end_argument := closepar|separator.
 :- regtype indent_level_t/1.
 indent_level_t(operator).
 indent_level_t(openpar(N, S)) :-
-	nnegint(N),
-	list(S).
+    nnegint(N),
+    list(S).
 
 :- export(token_type_t/1).
 :- regtype token_type_t/1.
 
 token_type_t := spaces|string|openfunc|openmeta|openoper|atom|number|cut|var|
-	endclause|comment1|commentn|operator|separator|openpar|closepar|unknown.
+    endclause|comment1|commentn|operator|separator|openpar|closepar|unknown.
 
 :- export(update_indent/3).
 :- pred update_indent(+token_type_t, ?list(indent_level_t),
-	    ?list(indent_level_t)).
+        ?list(indent_level_t)).
 
 update_indent(operator,  [],             [operator]) :- !.
 update_indent(endclause, [operator],     []) :- !.
@@ -165,7 +165,7 @@ bookmark_begin(operator) := "-->"|":-"|";"|"->"|":=".
 
 :- export(requires_previous_indent_level/2).
 requires_previous_indent_level(operator, A) :-
-	requires_previous_indent_level_op(A).
+    requires_previous_indent_level_op(A).
 requires_previous_indent_level(closepar, _).
 
 requires_previous_indent_level_op := ";"|"->"|"#".

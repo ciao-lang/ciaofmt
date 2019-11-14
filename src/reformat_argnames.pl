@@ -2,10 +2,10 @@
 :- use_package(argnames).
 
 :- argnames functordesc(name, tokentype, arg, indentlevel, pos, argdescs,
-	    parlevel).
+        parlevel).
 
 :- argnames functorproc(name, tokentype, arg, argt, indentlevel, pos,
-	    argdescs, argdescst, parlevel).
+        argdescs, argdescst, parlevel).
 
 :- argnames argdesc(arg, pos, bookmark).
 
