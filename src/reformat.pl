@@ -13,10 +13,12 @@
 :- use_module(library(messages), [show_message/2]).
 :- use_module(library(hiordlib), [maplist/2]).
 
-:- use_module(ciaofmt(idtokens),    [identify_tokens/6]).
-:- use_module(ciaofmt(poslastchar), [pos_last_char/3]).
-:- use_module(ciaofmt(normspaced), [normalize_spaced/3, new_lines/3,
-		num_lines/3]).
+:- use_module(ciaofmt(idtokens), [
+    identify_tokens/4, pos_last_char/3
+   ]).
+:- use_module(ciaofmt(normspaced), [
+    normalize_spaced/3, new_lines/3, num_lines/3
+   ]).
 :- use_module(ciaofmt(idfunctors)).
 :- use_module(ciaofmt(fmt_style)).
 
@@ -118,7 +120,7 @@ pos_last_char_no_nl(Value0, Pos0, Pos) :-
 	remove_nl(Value0, Value),
 	pos_last_char(Value, Pos0, Pos).
 
-create_autospace(ALines, ALines, _, PliConfig, 0, 0, _,
+create_autospace(ALines, ALines, _, _PliConfig, 0, 0, _,
 	    Token2, Tokens2, Pos0, Value1, Value1) :-
 	pos_last_char(Value1, Pos0, Pos1),
 	Token2 = token${value => Value2},
@@ -137,9 +139,10 @@ create_autospace(ALines, ALines, _, PliConfig, 0, 0, _,
 	;
 	    Pos = Pos2
 	),
-	Pos = pos(Col, _Line),
-	PliConfig = fmtconfig${max_length_line => MLL},
-	Col =< MLL,
+        % TODO: simplify? line break redistribution disabled
+	% Pos = pos(Col, _Line),
+	% PliConfig = fmtconfig${max_length_line => MLL},
+	% Col =< MLL,
 	!.
 create_autospace(ALines, ALines, _, _, Lines0, Lines0, _,
 	    token${type => TokenType2, value => Value}, _, _, _, Spaces) :-
@@ -150,7 +153,7 @@ create_autospace(ALines, ALines, _, _, Lines0, Lines0, _,
 	!,
 	(Lines0 == 0 -> Spaces0 = " " ; Spaces0 = ""),
 	new_lines(Lines0, Spaces, Spaces0).
-create_autospace(ALines0, ALines, IndentLevel, PliConfig, DLines0, DLines,
+create_autospace(ALines0, ALines, IndentLevel, _PliConfig, DLines0, DLines,
 	    TokenType0, Token2, _, Pos0, _, Spaces) :-
 	Token2 = token${type => TokenType2, value => Value0},
 	( DLines0 > 0 -> DLines1 = DLines0, ALines1 = ALines0,
@@ -169,10 +172,14 @@ create_autospace(ALines0, ALines, IndentLevel, PliConfig, DLines0, DLines,
 		Pos01 = pos(0, Line01_),
 		pos_last_char(Spaces2, Pos01, Pos1_),
 		pos_last_char(Value0,  Pos1_, Pos2_),
-		Pos1_ = pos(_,   Line1),
-		Pos2_ = pos(Col, Line2),
-		PliConfig = fmtconfig${max_length_line => MLL},
-		(Col > MLL ; Line2 - Line1 > 0)
+		Pos1_ = pos(_, Line1),
+		Pos2_ = pos(_, Line2),
+                % TODO: simplify? line break redistribution disabled
+%		Pos2_ = pos(Col, Line2),
+%		PliConfig = fmtconfig${max_length_line => MLL},
+%                MLL = 100000000000000000,
+%		(Col > MLL ; Line2 - Line1 > 0)
+		Line2 - Line1 > 0
 	    ->
 		Spaces1 = ""
 
@@ -198,13 +205,15 @@ special_spaced(_,        _,   Spaces,           Spaces).
 :- export(indent_length/3).
 create_indent(IndentLevel, Spaces0, Spaces) :-
 	indent_length(IndentLevel, 0, L),
-	NTabs is L // 8,
-	NSpac is L mod 8,
-	length(Tabs, NTabs),
-	maplist('='(0'\t), Tabs),
-	length(Spac, NSpac),
-	maplist('='(0' ), Spac),
-	append(Tabs,    Spac,   Spaces1),
+%	NTabs is L // 8,
+%	NSpac is L mod 8,
+%	length(Tabs, NTabs),
+%	maplist('='(0'\t), Tabs),
+%	length(Spac, NSpac),
+%	maplist('='(0' ), Spac),
+%	append(Tabs,    Spac,   Spaces1),
+	length(Spaces1, L),
+	maplist('='(0' ), Spaces1),
 	append(Spaces1, Spaces, Spaces0).
 
 fix_indent(L, 48) :-
@@ -218,7 +227,7 @@ inc_indent(I, L0, L) :-
 
 indent_length(_) --> fix_indent, !.
 indent_length([]) --> [].
-indent_length([operator]) --> !, inc_indent(8), indent_length([]).
+indent_length([operator]) --> !, inc_indent(4), indent_length([]).
 indent_length([_]) --> !, inc_indent(12), indent_length([]).
 indent_length([_|IndentLevel]) -->
 	long_indent,
@@ -239,8 +248,8 @@ dcg_app(String, L0, L) :-
 
 :- export(reformat/3).
 reformat(Source, SourceS, TargetS) :-
-	init_fmtconfig(PliConfig0),
-	identify_tokens(Tokens0, Source, PliConfig0, PliConfig, SourceS, []),
+	init_fmtconfig(PliConfig),
+	identify_tokens(Tokens0, Source, SourceS, []),
 	push_prolog_flag(write_strings, on), % TODO: find a better solution
 	normalize_spaced(Tokens0, PliConfig, Tokens1),
 	identify_functors(Tokens1, Tokens2, PliConfig, [], Argdescs0),

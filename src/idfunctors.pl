@@ -10,7 +10,7 @@
 
 :- use_module(library(hiordlib), [maplist/2]).
 :- use_module(library(lists)).
-:- use_module(ciaofmt(poslastchar)).
+:- use_module(ciaofmt(idtokens), [pos_last_char/3]).
 :- use_module(ciaofmt(fmt_style)).
 
 update_functors_openpar(
@@ -354,12 +354,12 @@ gen_spaces(N0, " "||Spaces0, Spaces) :-
 
 :- use_module(library(hiordlib), [maplist/3]).
 
-:- meta_predicate map(?, pred(4), ?, ?, ?).
-
-map([],     _,    []) --> [].
-map([A|As], Meta, [B|Bs]) -->
-	Meta(A, B),
-	map(As, Meta, Bs).
+% :- meta_predicate map(?, pred(4), ?, ?, ?).
+% 
+% map([],     _,    []) --> [].
+% map([A|As], Meta, [B|Bs]) -->
+% 	Meta(A, B),
+% 	map(As, Meta, Bs).
 
 % This works using backtracking but could be optimized
 % TODO: Really slow in practice

@@ -1,5 +1,4 @@
-:- module(idtokens, [identify_tokens/6, identify_tokens_/5],
-	    [assertions, dcg, fsyntax]).
+:- module(idtokens, [], [assertions, dcg, fsyntax]).
 
 :- doc(title, "Tokenizer").
 
@@ -10,7 +9,26 @@
 :- use_module(library(llists)).
 
 :- use_module(ciaofmt(fmt_style)).
-:- use_module(ciaofmt(poslastchar)).
+
+% ---------------------------------------------------------------------------
+
+% Predicate to get the position of the last char in a line
+:- export(pos_last_char/3).
+pos_last_char(Chars, Pos, Pos) :-
+	var(Chars), % this is approximated, because Chars could change later
+	!.
+pos_last_char([],           Pos,  Pos).
+pos_last_char([Char|Chars], Pos0, Pos) :-
+	pos_last_char_each(Char, Pos0, Pos1),
+	!,
+	pos_last_char(Chars, Pos1, Pos).
+
+pos_last_char_each(0'\n, pos(_, Line0), pos(0, Line1)) :-
+	Line1 is Line0 + 1.
+pos_last_char_each(0'\t, pos(Col0, Line0), pos(Col1, Line0)) :-
+	Col1 is (Col0 // 8 + 1) * 8.
+pos_last_char_each(_, pos(Col0, Line0), pos(Col1, Line0)) :-
+	Col1 is Col0 + 1.
 
 % ---------------------------------------------------------------------------
 
@@ -112,28 +130,9 @@ closepar(0'}).
 
 % ----------------------------------------------------------------------------
 
-process_command_in_comment(comment1, Value) --> !,
-	do_process_command_in_comment(Value).
-process_command_in_comment(commentn, Value) --> !,
-	do_process_command_in_comment(Value).
-process_command_in_comment(_, _) --> [].
-
-max_length_line_id := "max_length_line"|"ml".
-
-indentation_style_id := "indentation_style"|"is".
-
-do_process_command_in_comment(Value) -->
-	{append([_, ":- ", ~max_length_line_id, "(" || MLLS, ")."||_],
-		Value), number_codes(MLL, MLLS)} ->
-	set_max_length_line(MLL).
-do_process_command_in_comment(Value) -->
-	{append([_, ":- ", ~indentation_style_id, "(" || ISS, ")."||_],
-		Value), atom_codes(IS, ISS)} ->
-	set_indentation_style(IS).
-do_process_command_in_comment(_) --> [].
-
-identify_tokens(Tokens, Source, PliConfig0, PliConfig, String0, String) :-
-	identify_tokens_(Tokens, PliConfig0, PliConfig, String0, String),
+:- export(identify_tokens/4).
+identify_tokens(Tokens, Source, String0, String) :-
+	identify_tokens_(Tokens, String0, String),
 	( member(token(unknown, Value), Tokens) ->
 	    append(InitString, Value, String0),
 	    pos_last_char(InitString, pos(0, 1), pos(_Col, Line)),
@@ -148,54 +147,13 @@ identify_tokens(Tokens, Source, PliConfig0, PliConfig, String0, String) :-
 	; true
 	).
 
-:- test identify_tokens_(Tokens, P, _, String, Tail) : (
-	    String =
-	    ":- module(_, _, [assertions,language]).\nmain :- p(a).\n",
-	    P = fmtconfig(80, norm_spaced),
-	    Tail = []
-	) =>
-	(
-	    Tokens =
-	    [
-		token(operator, ":-"),
-		token(spaces, " "),
-		token(openfunc, "module("),
-		token(var, "_"),
-		token(separator, ","),
-		token(spaces, " "),
-		token(var, "_"),
-		token(separator, ","),
-		token(spaces, " "),
-		token(openpar, "["),
-		token(atom, "assertions"),
-		token(separator, ","),
-		token(atom, "language"),
-		token(closepar, "]"),
-		token(closepar, ")"),
-		token(endclause, "."),
-		token(spaces, "\n"),
-		token(atom, "main"),
-		token(spaces, " "),
-		token(operator, ":-"),
-		token(spaces, " "),
-		token(openfunc, "p("),
-		token(atom, "a"),
-		token(closepar, ")"),
-		token(endclause, "."),
-		token(spaces, "\n")
-	    ]
-	).
+:- export(identify_tokens_/3). % TODO: only for tests
+identify_tokens_([Token|Tokens]) --> get_token(Token), !, identify_tokens_(Tokens).
+identify_tokens_([]) --> "".
 
-identify_tokens_([Token|Tokens], PliConfig0, PliConfig) -->
-	get_token(Token, PliConfig0, PliConfig1),
-	!,
-	identify_tokens_(Tokens, PliConfig1, PliConfig).
-identify_tokens_([], PliConfig, PliConfig) --> "".
-
-get_token(token(TokenType, Value), PliConfig0, PliConfig, String0, String) :-
+get_token(token(TokenType, Value), String0, String) :-
 	parse_token(TokenType, String0, String),
-	append(Value, String, String0),
-	process_command_in_comment(TokenType, Value, PliConfig0, PliConfig).
+	append(Value, String, String0).
 
 parse_token(spaces) -->
 	parse_spaces,
@@ -464,3 +422,44 @@ parse_enclosed_(EncloseChar) -->
 parse_enclosed_(EncloseChar) -->
 	[_C],
 	parse_enclosed_(EncloseChar).
+
+% ---------------------------------------------------------------------------
+% Tests
+
+:- test identify_tokens_(Tokens, String, Tail) : (
+	    String =
+	    ":- module(_, _, [assertions,language]).\nmain :- p(a).\n",
+	    Tail = []
+	) =>
+	(
+	    Tokens =
+	    [
+		token(operator, ":-"),
+		token(spaces, " "),
+		token(openfunc, "module("),
+		token(var, "_"),
+		token(separator, ","),
+		token(spaces, " "),
+		token(var, "_"),
+		token(separator, ","),
+		token(spaces, " "),
+		token(openpar, "["),
+		token(atom, "assertions"),
+		token(separator, ","),
+		token(atom, "language"),
+		token(closepar, "]"),
+		token(closepar, ")"),
+		token(endclause, "."),
+		token(spaces, "\n"),
+		token(atom, "main"),
+		token(spaces, " "),
+		token(operator, ":-"),
+		token(spaces, " "),
+		token(openfunc, "p("),
+		token(atom, "a"),
+		token(closepar, ")"),
+		token(endclause, "."),
+		token(spaces, "\n")
+	    ]
+	).
+

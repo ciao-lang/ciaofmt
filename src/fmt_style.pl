@@ -9,16 +9,6 @@
 
 indentation_style_t := full_spaced|norm_spaced|left_spaced|save_spaces.
 
-:- export(set_max_length_line/3).
-set_max_length_line(MLL,
-	    fmtconfig${indentation_style => IS},
-	    fmtconfig${indentation_style => IS, max_length_line => MLL}).
-
-:- export(set_indentation_style/3).
-set_indentation_style(IS,
-	    fmtconfig${max_length_line => MLL},
-	    fmtconfig${max_length_line => MLL, indentation_style => IS}).
-
 :- export(fmtconfig_t/1).
 :- regtype fmtconfig_t/1.
 fmtconfig_t(fmtconfig${max_length_line => MLL, indentation_style => IS}) :-
@@ -34,7 +24,7 @@ fmtconfig_t(fmtconfig${max_length_line => MLL, indentation_style => IS}) :-
 :- export(init_fmtconfig/1).
 :- pred init_fmtconfig(?fmtconfig_t) # "Get default configuration values".
 init_fmtconfig(fmtconfig${
-		max_length_line => ~max_line_length,
+		max_length_line => ~max_line_length, % TODO: ignored for reformatting
 		indentation_style => norm_spaced
 	    }).
 
