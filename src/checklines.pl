@@ -1,5 +1,5 @@
 :- module(checklines, [checklines/1, checklines/2, checklines_string/3],
-        [assertions, hiord_old, fsyntax]).
+        [assertions, hiord, fsyntax]).
 
 :- use_module(library(stream_utils)).
 :- use_module(library(lists)).
@@ -26,7 +26,7 @@ checklines_string(FileName, String, Length) :-
     maplist(message_line_too_long(FileName), LinesTooLong, Messages),
     messages(Messages).
 
-message_line_too_long(Line, FileName,
+message_line_too_long(FileName, Line,
     message_lns(FileName, Line, Line, warning, ['Line too long'])).
 
 lines_too_long(String, Length, LinesTooLong) :-

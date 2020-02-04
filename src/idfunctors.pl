@@ -2,7 +2,7 @@
             remove_nl/2,
             identify_functors/5,
             auto_space_argdescs/2],
-        [assertions, regtypes, hiord_old, dcg, fsyntax, nativeprops]).
+        [assertions, regtypes, hiord, dcg, fsyntax, nativeprops]).
 
 :- doc(title, "Functor formatter").
 
@@ -374,14 +374,14 @@ pos_bookmarks(Argdescs, Scheme, PosBookmarkss) :-
 % some examples (see above)
 pos_bookmark_f(_,_,[]).
 %
-% pos_bookmark_f(argdesc${arg => Functors}, Scheme, PosBookmarks) :-
+% pos_bookmark_f(Scheme, argdesc${arg => Functors}, PosBookmarks) :-
 %       map(Functors, pos_bookmark_f_, Scheme, PosBookmarks, []).
 % 
-% pos_bookmark_f_(functordesc${argdescs => Argdescs}, Scheme) -->
+% pos_bookmark_f_(Scheme, functordesc${argdescs => Argdescs}) -->
 %       map(Argdescs, pos_bookmark_f__, Scheme).
 % 
-% pos_bookmark_f__(argdesc${arg => Functors, pos => Pos,
-%               bookmark => Bookmark}, Scheme) -->
+% pos_bookmark_f__(Scheme, argdesc${arg => Functors, pos => Pos,
+%               bookmark => Bookmark}) -->
 %       (
 %           {var(Scheme), Functors \== []} ->
 %           (map(Functors, pos_bookmark_f_, Scheme) ; {Scheme = []}) % TODO: slow!
