@@ -83,7 +83,7 @@ do_process(reformat(Source, Target)) :- !,
 read_source(Source, String) :-
     ( Source = '-' -> % read from stdin
         current_input(CI),
-        read_to_end(CI, String),
+        read_string_to_end(CI, String),
         close(CI) % TODO: sure?
     ; file_to_string(Source, String)
     ).
