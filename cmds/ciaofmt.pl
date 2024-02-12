@@ -8,9 +8,7 @@
 :- doc(module, "This command offers source code formatting and style
    checking operations for Ciao (and Prolog) source code.
 
-@begin{verbatim}
 @includefact{usage_message/1}
-@end{verbatim}
 ").
 
 :- use_module(library(messages), [show_message/3]).
